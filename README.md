@@ -5,16 +5,19 @@ This is a conversational AI chatbot designed for medical purposes. It helps user
 ## Features
 
 - **Health Assistance:** Provides general information about symptoms, diseases, and medications.
-- **Medical Queries:** Responds to user queries with relevant answers based on a medical knowledge base.
-- **User-Friendly Interface:** Easy-to-use chatbot interface for seamless interactions.
+- **Medical Query Responses:** The chatbot answers user queries based on an indexed medical knowledge base.
+- **State-of-the-art AI:** Uses Pinecone for vector search, Groq API for language model processing, and Hugging Face embeddings for semantic understanding.
+- **Customizable and Scalable:** Easy to extend for additional models or data sources.
 
 ## Technologies Used
 
-- Python
-- TensorFlow
-- Natural Language Processing (NLP)
-- Flask (for API/web interface)
-- Chatbot Framework (Langchain)
+- **Python:** Programming language.
+- **Flask:** Web framework for serving the chatbot interface.
+- **Langchain:** A framework that simplifies the creation of LLM-based applications.
+- **Pinecone:** Vector database for efficient semantic search.
+- **Groq API:** Powerful API for running AI models like `llama3-8b-8192`.
+- **Hugging Face:** Used for downloading and using pre-trained embeddings for text.
+- **Dotenv:** To manage sensitive environment variables.
 
 ## Installation
 
@@ -28,7 +31,12 @@ This is a conversational AI chatbot designed for medical purposes. It helps user
 ```bash
 pip install -r requirements.txt
 ```
-3. Run the application:
+3. Set up environment variables:
+```
+PINECONE_API_KEY=your_pinecone_api_key
+GROQ_API_KEY=your_groq_api_key
+```
+4. Run the application:
 ```
 python app.py
 ```
