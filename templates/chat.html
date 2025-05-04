@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Medical Chatbot</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <!-- Bootstrap & FontAwesome -->
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.15.4/css/all.css">
+    
+    <!-- Custom CSS -->
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+    <div class="toggle-container">
+        <label class="switch">
+            <input type="checkbox" id="darkModeToggle">
+            <span class="slider round"></span>
+        </label>
+        <span class="toggle-text">Dark Mode</span>
+    </div>
+
+    <div class="container chat-container">
+        <div class="row justify-content-center align-items-center h-100">
+            <div class="col-md-4 d-none d-md-block text-center">
+				<img src="{{ url_for('static', filename='doctor.gif') }}" alt="Doctor" class="doctor-img">
+
+            </div>
+
+            <div class="col-md-8">
+                <div class="card chat-card">
+                    <div class="card-header chat-header d-flex align-items-center">
+                        <img src="https://cdn-icons-png.flaticon.com/512/387/387569.png" class="chatbot-avatar rounded-circle mr-3" />
+                        <div>
+                            <h5 class="mb-0">Medical Chatbot</h5>
+                            <small class="text-muted">Ask me anything!</small>
+                        </div>
+                    </div>
+
+                    <div class="card-body chat-body" id="messageFormeight"></div>
+
+                    <div class="card-footer chat-footer">
+                        <form id="messageArea" class="input-group">
+                            <input type="text" id="text" name="msg" class="form-control" placeholder="Type your message..." required>
+                            <div class="input-group-append">
+                                <button type="button" class="btn voice-btn" id="voiceBtn"><i class="fas fa-microphone"></i></button>
+                                <button type="submit" class="btn send-btn"><i class="fas fa-paper-plane"></i></button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script>
+        $(document).ready(function () {
+            $("#messageArea").on("submit", function (event) {
+                event.preventDefault();
+                const time = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+                const rawText = $("#text").val();
+
+                // Add user message
+				const userHtml = `
+					<div class="d-flex justify-content-end mb-3">
+						<div class="msg user-msg">
+							${rawText}
+							<span class="msg-time">${time}</span>
+						</div>
+						<img src="https://cdn-icons-png.flaticon.com/512/847/847969.png" class="chat-avatar ml-2">
+					</div>`;
+				$("#text").val("");
+				$("#messageFormeight").append(userHtml);
+
+				// Bot typing animation
+				const typingHtml = `
+					<div class="d-flex justify-content-start mb-3" id="typing-indicator">
+						<img src="https://cdn-icons-png.flaticon.com/512/387/387569.png" class="chat-avatar mr-2">
+						<div class="msg bot-msg typing">
+							<span class="dot"></span><span class="dot"></span><span class="dot"></span>
+						</div>
+					</div>`;
+				$("#messageFormeight").append(typingHtml);
+
+				$.ajax({
+					data: { msg: rawText },
+					type: "POST",
+					url: "/get",
+				}).done(function (data) {
+					$("#typing-indicator").remove();
+					const botHtml = `
+						<div class="d-flex justify-content-start mb-3">
+							<img src="https://cdn-icons-png.flaticon.com/512/387/387569.png" class="chat-avatar mr-2">
+							<div class="msg bot-msg">
+								${data}
+								<span class="msg-time">${time}</span>
+							</div>
+						</div>`;
+					$("#messageFormeight").append(botHtml);
+				});
+            });
+
+            // Dark mode toggle
+            $('#darkModeToggle').change(function () {
+                $('body').toggleClass('dark-mode');
+            });
+
+            // Voice input
+            const recognition = window.SpeechRecognition || window.webkitSpeechRecognition ? new (window.SpeechRecognition || window.webkitSpeechRecognition)() : null;
+            if (recognition) {
+                $('#voiceBtn').on('click', function () {
+                    recognition.start();
+                });
+
+                recognition.onresult = function (event) {
+                    $('#text').val(event.results[0][0].transcript);
+                };
+            }
+        });
+    </script>
+</body>
+</html>
